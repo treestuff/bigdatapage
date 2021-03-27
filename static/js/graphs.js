@@ -32,6 +32,7 @@ function makeGraphs(error, recordsJson) {
 	var slopeYearDim = ndx.dimension(function(d) { return d["ConstructionYear"]; });
 	var ownerDim = ndx.dimension(function(d) { return d["Owner"]; });
 	var slopeDegreeDim = ndx.dimension(function(d) { return d["Degree"]; });
+	var failTypeDim = ndx.dimension(function(d) { return d["FailType"]; });
 	var allDim = ndx.dimension(function(d) {return d;});
 
 
@@ -50,6 +51,7 @@ function makeGraphs(error, recordsJson) {
 	var slopeYearGroup = slopeYearDim.group();
 	var ownerGroup = ownerDim.group();
 	var slopeDegreeGroup = slopeDegreeDim.group();
+	var failTypeGroup = failTypeDim.group();
 	var all = ndx.groupAll();
 
 
@@ -74,6 +76,7 @@ function makeGraphs(error, recordsJson) {
     var slopeYearChart = dc.pieChart("#slope-year");
     var ownerChart = dc.pieChart("#owner-pie-chart");
     var slopeDegreeChart = dc.barChart("#slope-degree")
+    var failTypeCHart = dc.rowChart("#failType")
 
 	numberRecordsND
 		.formatNumber(d3.format("d"))
@@ -245,6 +248,19 @@ function makeGraphs(error, recordsJson) {
         .group(slopeDegreeGroup)
         .elasticY(true)
         .colors(['#6baed6'])
+
+	failTypeCHart
+	    .width(450)
+        .height(200)
+        .dimension(failTypeDim)
+        .group(failTypeGroup)
+        .label(function(d){
+            return d.key + " : " + d.value + " - " +(d.value / ndx.groupAll().reduceCount().value() * 100).toFixed(2) + "%";
+        })
+        .ordering(function(d) { return -d.value })
+        .colors(['#6baed6'])
+        .elasticX(true)
+        .xAxis().ticks(4);
 
 	var map = L.map('map');
 	
